@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmer Assistance Chatbot</title>
+    <style>
+        :root {
+            --primary: #156317;
+            --secondary: #1c9322;
+            --light: #E8F5E9;
+            --dark: #eef3ef;
+            --gray: #e3e7e6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5faf3;
+            color: #333;
+            line-height: 1.6;
+            padding-top: 200px; /* Add padding to body to avoid content overlap with fixed header */
+        }
+
+        /* Fixed header and navigation */
+        .fixed-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000; /* Ensure it stays above other content */
+            background-color: var(--primary);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        header {
+            padding: 1rem;
+            text-align: center;
+            color: rgb(253, 248, 248);
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            background-color: var(--secondary);
+            padding: 0.5rem;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            margin: 0 0.5rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        nav a:hover {
+            background-color: var(--dark);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .hero {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 3rem;
+            gap: 2rem;
+        }
+
+        .hero-content {
+            flex: 1;
+        }
+
+        .hero-image {
+            flex: 1;
+            text-align: center;
+        }
+
+        .hero-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--dark);
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--secondary);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--primary);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: var(--secondary);
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .feature-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .feature-card h3 {
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .chatbot-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .chatbot-header {
+            background-color: var(--primary);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chatbot-header h3 {
+            margin: 0;
+        }
+
+        .chat-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-messages {
+            height: 300px;
+            padding: 1rem;
+            overflow-y: auto;
+            background-color: var(--light);
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            padding: 0.8rem;
+            border-radius: 8px;
+            max-width: 70%;
+            position: relative;
+        }
+
+        .bot-message {
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-right: auto;
+        }
+
+        .user-message {
+            background-color: var(--primary);
+            color: white;
+            margin-left: auto;
+        }
+
+        .message-actions {
+            position: absolute;
+            right: 10px;
+            bottom: 5px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .bot-message:hover .message-actions {
+            opacity: 1;
+        }
+
+        .message-actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--secondary);
+            font-size: 1rem;
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 1rem;
+            background-color: white;
+            border-top: 1px solid #eee;
+            align-items: center;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-right: 0.5rem;
+        }
+
+        .chat-input button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 0.8rem 1.2rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .chat-input button:hover {
+            background-color: var(--secondary);
+        }
+
+        .mic-button {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            margin-right: 8px;
+            transition: background-color 0.3s;
+        }
+
+        .mic-button.recording {
+            background-color: #d32f2f;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .language-selector {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 0.5rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .about-section {
+            background-color: var(--gray);
+            padding: 3rem 2rem;
+            border-radius: 8px;
+            margin: 3rem 0;
+        }
+
+        footer {
+            background-color: var(--secondary);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                flex-direction: column;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
+
+            .chatbot-header {
+                flex-direction: column;
+                gap: 10px;
+                padding: 1rem 0.5rem;
+            }
+
+            .chat-controls {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Crop Management Section Styles */
+        .crop-management-section {
+            display: none; /* Hidden by default */
+            margin-top: 2rem;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .crop-management-section h2 {
+            color: var(--secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .crop-management-section p {
+            margin-bottom: 1rem;
+        }
+
+        .crop-management-section ul {
+            margin-left: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .crop-management-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .crop-management-section .btn {
+            margin-top: 1rem;
+        }
+        /* Crop Management Section Styles */
+        .pest-disease-identification-section {
+            display: none; /* Hidden by default */
+            margin-top: 2rem;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .pest-disease-identification-section h2 {
+            color: var(--secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .pest-disease-identification-section p {
+            margin-bottom: 1rem;
+        }
+
+        .pest-disease-identification-section ul {
+            margin-left: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .pest-disease-identification-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .pest-disease-identification-section .btn {
+            margin-top: 1rem;
+        }
+        .water-resource-optimization-section {
+            display: none; /* Hidden by default */
+            margin-top: 2rem;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .water-resource-optimization-section h2 {
+            color: var(--secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .water-resource-optimization-section p {
+            margin-bottom: 1rem;
+        }
+
+        .water-resource-optimization-section ul {
+            margin-left: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .water-resource-optimization-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .water-resource-optimization-section .btn {
+            margin-top: 1rem;
+        }
+        .market-insights-section {
+            display: none; /* Hidden by default */
+            margin-top: 2rem;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .market-insights-section h2 {
+            color: var(--secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .market-insights-section p {
+            margin-bottom: 1rem;
+        }
+
+        .market-insights-section ul {
+            margin-left: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .market-insights-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .market-insights-section .btn {
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Fixed Header and Navigation -->
+    <div class="fixed-header">
+        <header>
+            <h1>Farmer Assistance Chatbot</h1>
+            <p>Our Farming Chatbot provides the detailed Analyses on Agriculture</p>
+        </header>
+
+        <nav>
+            <a href="#home">Home</a>
+            <a href="#about">About</a>
+            <a href="#features">Features</a>
+            <a href="#chatbot">Chatbot</a>
+            <a href="#contact">Contact</a>
+        </nav>
+    </div>
+
+    <!-- Scrollable Content -->
+    <div class="container">
+        <section class="hero" id="home">
+            <div class="hero-content">
+                <h2>Empowering Farmers with Technology</h2>
+                <p>Get expert advice, crop management tips, disease identification, water optimization strategies, and market insights - all in one place.</p>
+                <a href="#chatbot" class="btn">Start Chatting</a>
+            </div>
+            <div class="hero-image">
+                <img src="fac.jpg" alt="Farming with technology">
+            </div>
+        </section>
+
+        <section class="about-section" id="about">
+            <h2>About Our Farmer Support Chatbot</h2>
+            <p>The Farmer Assistance Chatbot is an innovative project designed to support farmers through a conversational AI-powered chatbot. The chatbot provides personalized advice, answers frequently asked questions, and offers critical information on farming best practices, crop management, and market trends. By leveraging AI and NLP, the chatbot enables conversational interactions, making it a valuable resource for smallholder farmers and rural communities.</p>
+            <p>The chatbot aims to improve farmer productivity, enhance knowledge, facilitate market access, and reduce stress. It provides timely and relevant information, helping farmers make informed decisions about their crops, soil, and market conditions. Additionally, the chatbot offers emotional support and counseling, recognizing the importance of mental health in farming communities. By bridging the information gap and providing personalized support, the Farmer Assistance Chatbot has the potential to transform the lives of farmers and contribute to sustainable agricultural development.</p>
+            <p>Developed in collaboration with agricultural experts, our system continuously learns and improves to provide you with the most up-to-date farming recommendations.</p>
+        </section>
+
+        <section id="features">
+            <h2>Key Features</h2>
+            <div class="features">
+                <div class="feature-card" onclick="showCropManagement()">
+                    <div class="feature-icon">🌱</div>
+                    <h3>Crop Management</h3>
+                    <p>Get customized advice on planting schedules, crop rotation, fertilization, and harvesting techniques for optimal yields.</p>
+                </div>
+
+                <div class="feature-card" onclick="showPestDisease()">
+                    <div class="feature-icon">🔍</div>
+                    <h3>Pest & Disease Identification</h3>
+                    <p>Upload photos of affected plants to identify pests and diseases, with recommended treatment options.</p>
+                </div>
+
+                <div class="feature-card" onclick="showWaterOptimization()">
+                    <div class="feature-icon">💧</div>
+                    <h3>Water & Resource Optimization</h3>
+                    <p>Receive guidance on efficient irrigation, water conservation, and sustainable farming practices.</p>
+                </div>
+
+                <div class="feature-card" onclick="showMarketInsights()">
+                    <div class="feature-icon">📊</div>
+                    <h3>Market Insights</h3>
+                    <p>Access up-to-date information on crop prices, market trends, and selling opportunities in your region.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Crop Management Section -->
+        <section id="crop-management" class="crop-management-section">
+            <h2>Crop Management</h2>
+            <p>Crop management involves planning, monitoring, and controlling crop growth to optimize yields and quality. It encompasses soil preparation, irrigation, fertilization, pest and disease management, and harvesting. Effective crop management helps farmers reduce costs, increase efficiency, and minimize environmental impact. It also involves monitoring weather conditions, soil moisture, and crop health to make informed decisions. By adopting best management practices, farmers can improve crop productivity, reduce waste, and promote sustainable agriculture. This leads to increased profitability, improved food security, and environmental stewardship.</p>
+            <h3>Key Practices:</h3>
+            <ul>
+                <li><strong>Soil Preparation:</strong> Proper plowing, leveling, and adding fertilizers or organic matter.</li>
+                <li><strong>Planting:</strong> Choosing the right time, seed quality, and spacing.</li>
+                <li><strong>Irrigation:</strong> Efficient water management using techniques like drip irrigation.</li>
+                <li><strong>Pest Control:</strong> Integrated Pest Management (IPM) to protect crops.</li>
+                <li><strong>Harvesting:</strong> Timely harvesting and proper storage to prevent losses.</li>
+            </ul>
+            <a href="#chatbot" class="btn">Ask More About Crop Management</a>
+        </section>
+        <section id="pest-disease-identification" class="pest-disease-identification-section"> 
+            <h2>Pest & Disease Identification</h2>
+             <p>Identifying pests and diseases is crucial for effective crop protection and management. Early detection can prevent significant crop damage and ensure healthy growth.
+                Pest and disease identification is a critical component of crop management. It involves monitoring crops for signs of pests or diseases, such as insects, fungi, or bacteria. Accurate identification is essential to determine the best course of treatment and prevent the spread of infestations. Techniques include visual inspections, laboratory testing, and the use of specialized equipment. Early detection and identification enable farmers to take targeted action, reducing crop damage and minimizing the use of chemical pesticides and fungicides.
+             </p> 
+             <h3>Key Practices:</h3> 
+             <ul>
+                 <li><strong>Visual Inspection:</strong> Regularly inspecting crops for signs of pest infestation or disease symptoms.</li>
+                  <li><strong>Symptom Recognition:</strong> Understanding common symptoms like leaf discoloration, wilting, and abnormal growth.</li>
+                   <li><strong>Monitoring Tools:</strong> Using tools like traps and sensors to detect pests early.</li> 
+                   <li><strong>Expert Consultation:</strong> Seeking advice from agricultural experts or extension services for accurate identification.</li>
+                    <li><strong>Action Plan:</strong> Implementing timely and appropriate control measures once pests or diseases are identified.</li>
+                 </ul>
+             <a href="#chatbot" class="btn">Ask More About Pest & Disease Identification</a>
+
+        </section>
+        <section id="water-resource-optimization" class="water-resource-optimization-section">
+            <h2>Water & Resource Optimization</h2>
+            <p>Water and resource optimization focuses on the efficient use of water, energy, and other resources to enhance sustainability and productivity in farming. This ensures minimal waste while maximizing crop health and yield.
+                Water and resource optimization is crucial in agriculture to minimize waste and maximize efficiency. This involves using precision irrigation systems, soil moisture sensors, and weather forecasting to optimize water application. Additionally, implementing conservation tillage, mulching, and crop rotation helps reduce soil erosion and retain moisture. By optimizing water and resource use, farmers can reduce costs, improve crop yields, and promote sustainable agriculture practices. This approach also helps mitigate the impacts of climate change, ensuring a more resilient and productive agricultural system. Efficient use of resources is essential.
+            </p>
+            <h3>Key Practices:</h3>
+            <ul>
+                <li><strong>Efficient Irrigation:</strong> Techniques like drip irrigation and sprinklers to minimize water waste.</li>
+                <li><strong>Soil Moisture Monitoring:</strong> Using sensors to track soil moisture levels and avoid over- or under-watering.</li>
+                <li><strong>Water Harvesting:</strong> Capturing and storing rainwater for irrigation purposes.</li>
+                <li><strong>Energy Optimization:</strong> Utilizing renewable energy sources like solar power for irrigation systems.</li>
+                <li><strong>Nutrient Management:</strong> Ensuring efficient use of fertilizers to reduce waste and improve crop growth.</li>
+            </ul>
+            <a href="#chatbot" class="btn">Ask More About Water & Resource Optimization</a>
+        </section>
+        <section id="market-insights" class="market-insights-section">
+            <h2>Market Insights</h2>
+            <p>Market insights involve understanding current trends, demands, and pricing in the agricultural market. This helps farmers make informed decisions about what to grow, when to harvest, and how to sell for maximum profit.
+                Market insights for the Farmer Assistance Chatbot reveal a growing demand for digital agricultural solutions. Key trends include:
+
+                    - Increasing adoption of mobile devices among farmers
+                    - Rising need for data-driven decision making
+                    - Growing importance of precision agriculture
+                    - Escalating concerns about climate change and sustainability
+                    - Expanding demand for crop monitoring and advisory services
+
+                By providing actionable market insights, the chatbot can empower farmers to make informed decisions, optimize yields, and improve profitability. Real-time market data and analysis can help farmers navigate complex market dynamics and stay competitive.
+            </p>
+            <h3>Key Practices:</h3>
+            <ul>
+                <li><strong>Market Trend Analysis:</strong> Keeping track of price fluctuations and demand for different crops throughout the year.</li>
+                <li><strong>Supply Chain Optimization:</strong> Streamlining processes to get products to market faster and more efficiently.</li>
+                <li><strong>Competitive Pricing:</strong> Setting competitive prices based on market conditions and competitor analysis.</li>
+                <li><strong>Consumer Behavior Insights:</strong> Understanding the preferences and needs of consumers to meet demand effectively.</li>
+                <li><strong>Sales Channels:</strong> Exploring different sales channels, including local markets, online platforms, and export opportunities.</li>
+            </ul>
+            <a href="#chatbot" class="btn">Ask More About Market Insights</a>
+        </section>
+        <section id="chatbot">
+            <h2>Chat with our Farming Assistant</h2>
+            <div class="chatbot-container">
+                <div class="chatbot-header">
+                    <h3>Farmer Support Chatbot</h3>
+                    <div class="chat-controls">
+                        <select id="language-selector" class="language-selector">
+                            <option value="en">English</option>
+                            <option value="te">తెలుగు (Telugu)</option>
+                            <option value="hi">हिंदी (Hindi)</option>
+                        </select>
+                        <button id="tts-toggle" class="btn" style="padding: 0.4rem 0.8rem; font-size: 0.9rem;">
+                            <span id="tts-icon">🔊</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="chat-messages" id="chat-messages">
+                    <div class="message bot-message">
+                        Hello! I'm your Farming Assistant. How can I help you today? Ask me about crop management, pest identification, water optimization, or market insights.
+                        <div class="message-actions">
+                            <button class="speak-button" aria-label="Listen to message">🔊</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-input">
+                    <button id="mic-button" class="mic-button" aria-label="Use microphone">
+                        <span id="mic-icon">🎤</span>
+                    </button>
+                    <input type="text" id="chat-input" placeholder="Type your farming question here...">
+                    <button id="send-button">
+                        <span>Send</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" style="margin-top: 3rem;">
+            <h2>Need More Help?</h2>
+            <p>Our team of agricultural experts is ready to assist you with more complex farming challenges.</p>
+            <a href="#" class="btn">Contact Us</a>
+        </section>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Farmer Support Chatbot. All rights reserved.</p>
+        <p>Providing intelligent farming solutions for a sustainable future.</p>
+    </footer>
+
+    <script>
+        // Function to show Crop Management section
+        function showCropManagement() {
+            const cropManagementSection = document.getElementById('crop-management');
+            cropManagementSection.style.display = 'block';
+            window.scrollTo({
+                top: cropManagementSection.offsetTop - 100,
+                behavior: 'smooth'
+            });
+        }
+        function showPestDisease() {
+            const cropManagementSection = document.getElementById('pest-disease-identification');
+            cropManagementSection.style.display = 'block';
+            window.scrollTo({
+                top: cropManagementSection.offsetTop - 100,
+                behavior: 'smooth'
+            });
+        }
+        function showWaterOptimization() {
+            const cropManagementSection = document.getElementById('water-resource-optimization');
+            cropManagementSection.style.display = 'block';
+            window.scrollTo({
+                top: cropManagementSection.offsetTop - 100,
+                behavior: 'smooth'
+            });
+        }
+        function showMarketInsights() {
+            const cropManagementSection = document.getElementById('market-insights');
+            cropManagementSection.style.display = 'block';
+            window.scrollTo({
+                top: cropManagementSection.offsetTop - 100,
+                behavior: 'smooth'
+            });
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM elements
+            const chatInput = document.getElementById('chat-input');
+            const sendButton = document.getElementById('send-button');
+            const chatMessages = document.getElementById('chat-messages');
+            const micButton = document.getElementById('mic-button');
+            const micIcon = document.getElementById('mic-icon');
+            const languageSelector = document.getElementById('language-selector');
+            const ttsToggle = document.getElementById('tts-toggle');
+            const ttsIcon = document.getElementById('tts-icon');
+            
+            // State variables
+            let isListening = false;
+            let recognition = null;
+            let autoTTS = false;
+            let currentLanguage = 'en';
+            let speechSynthesis = window.speechSynthesis;
+            let speechUtterance = null;
+            
+            // Initialize speech recognition
+            function initializeSpeechRecognition() {
+                if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+                    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                    recognition = new SpeechRecognition();
+                    recognition.continuous = false;
+                    recognition.interimResults = false;
+                    
+                    recognition.onstart = function() {
+                        isListening = true;
+                        micButton.classList.add('recording');
+                        micIcon.textContent = '⏹️';
+                    };
+                    
+                    recognition.onend = function() {
+                        isListening = false;
+                        micButton.classList.remove('recording');
+                        micIcon.textContent = '🎤';
+                    };
+                    
+                    recognition.onresult = function(event) {
+                        const transcript = event.results[0][0].transcript;
+                        chatInput.value = transcript;
+                        setTimeout(() => {
+                            sendMessage();
+                        }, 500);
+                    };
+                    
+                    recognition.onerror = function(event) {
+                        console.error('Speech recognition error:', event.error);
+                        isListening = false;
+                        micButton.classList.remove('recording');
+                        micIcon.textContent = '🎤';
+                    };
+                } else {
+                    micButton.style.display = 'none';
+                    alert('Speech recognition is not supported in your browser.');
+                }
+            }
+            
+            // Update recognition language
+            function updateRecognitionLanguage() {
+                if (recognition) {
+                    recognition.lang = currentLanguage;
+                }
+            }
+            
+            // Toggle speech recognition
+            function toggleSpeechRecognition() {
+                if (isListening) {
+                    recognition.stop();
+                } else {
+                    updateRecognitionLanguage();
+                    recognition.start();
+                }
+            }
+            
+            // Text-to-speech for a message
+            function speakMessage(text) {
+                if (speechSynthesis) {
+                    // Cancel any ongoing speech
+                    speechSynthesis.cancel();
+                    
+                    speechUtterance = new SpeechSynthesisUtterance(text);
+                    speechUtterance.lang = currentLanguage;
+                    
+                    // Find a voice that matches the language
+                    const voices = speechSynthesis.getVoices();
+                    const matchingVoice = voices.find(voice => voice.lang.startsWith(currentLanguage));
+                    if (matchingVoice) {
+                        speechUtterance.voice = matchingVoice;
+                    }
+                    
+                    speechSynthesis.speak(speechUtterance);
+                }
+            }
+            
+            // Toggle auto text-to-speech
+            function toggleAutoTTS() {
+                autoTTS = !autoTTS;
+                ttsIcon.textContent = autoTTS ? '🔊' : '🔇';
+            }
+            
+            // Update UI language based on selection
+            function updateLanguage() {
+                currentLanguage = languageSelector.value;
+                updateRecognitionLanguage();
+                
+                const placeholders = {
+                    'en': "Type your farming question here...",
+                    'te': "మీ వ్యవసాయ ప్రశ్నను ఇక్కడ టైప్ చేయండి...",
+                    'hi': "अपना कृषि प्रश्न यहाँ टाइप करें...",
+                    'ta': "உங்கள் விவசாய கேள்வியை இங்கே தட்டச்சு செய்க...",
+                    'ka': "ನಿಮ್ಮ ಕೃಷಿ ಪ್ರಶ್ನೆಯನ್ನು ಇಲ್ಲಿ ಟೈಪ್ ಮಾಡಿ..."
+                };
+                
+                const sendTexts = {
+                    'en': "Send",
+                    'te': "పంపించు",
+                    'hi': "भजें",
+                    'ta': "அனுப்பு",
+                    'ka': "ಕಳುಹಿಸಿ"
+                };
+                
+                chatInput.placeholder = placeholders[currentLanguage] || placeholders['en'];
+                sendButton.querySelector('span').textContent = sendTexts[currentLanguage] || sendTexts['en'];
+                
+                // Translate welcome message if this is the first language change
+                const welcomeMessage = chatMessages.querySelector('.bot-message');
+                if (welcomeMessage && welcomeMessage.dataset.translated !== 'true') {
+                    const welcomeTexts = {
+                        'en': "Hello! I'm your Farming Assistant. How can I help you today? Ask me about crop management, pest identification, water optimization, or market insights.",
+                        'te': "హలో! నేను మీ వ్యవసాయ సహాయకుడిని. ఈరోజు మీకు ఎలా సహాయం చేయగలను? పంటల నిర్వహణ, కీటకాల గుర్తింపు, నీటి అనుకూలీకరణ, లేదా మార్కెట్ అంతర్దృష్టుల గురించి నన్ను అడగండి.",
+                        'hi': "नमस्ते! मैं आपका कृषि सहायक हूं। आज मैं आपकी कैसे मदद कर सकता हूं? मुझसे फसल प्रबंधन, कीट पहचान, पानी अनुकूलन, या बाजार अंतर्दृष्टि के बारे में पूछें।",
+                        'ta': "வணக்கம்! நான் உங்கள் விவசாய உதவியாளன். இன்று உங்களுக்கு எப்படி உதவலாம்? பயிர் மேலாண்மை, பூச்சி அடையாளம், நீர் மேம்பாடு, அல்லது சந்தை பற்றிய பார்வைகள் குறித்து என்னிடம் கேளுங்கள்.",
+                        'ka': "你好ನಮಸ್ಕಾರ! ನಾನು ನಿಮ್ಮ ಕೃಷಿ ಸಹಾಯಕ. ಇಂದು ನಿಮಗೆ ಹೇಗೆ ಸಹಾಯ ಮಾಡಲಿ? ಬೆಳೆ ನಿರ್ವಹಣೆ, ಕೀಟ ಗುರುತಿಸುವಿಕೆ, ನೀರಿನ ಅನುಕೂಲತೆ, ಅಥವಾ ಮಾರುಕಟ್ಟೆ ಒಳನೋಟಗಳ ಬಗ್ಗೆ ನನ್ನನ್ನು ಕೇಳಿ.。"
+                    };
+                    
+                    welcomeMessage.textContent = welcomeTexts[currentLanguage] || welcomeTexts['en'];
+                    welcomeMessage.dataset.translated = 'true';
+                }
+            }
+            
+            // Add a new message to the chat
+            function addMessage(text, isUser = false) {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message');
+                messageElement.classList.add(isUser ? 'user-message' : 'bot-message');
+                messageElement.textContent = text;
+                
+                // Add speech button for bot messages
+                if (!isUser) {
+                    const messageActions = document.createElement('div');
+                    messageActions.classList.add('message-actions');
+                    
+                    const speakButton = document.createElement('button');
+                    speakButton.classList.add('speak-button');
+                    speakButton.setAttribute('aria-label', 'Listen to message');
+                    speakButton.textContent = '🔊';
+                    speakButton.addEventListener('click', function() {
+                        speakMessage(text);
+                    });
+                    
+                    messageActions.appendChild(speakButton);
+                    messageElement.appendChild(messageActions);
+                    
+                    // Auto speak if enabled
+                    if (autoTTS) {
+                        setTimeout(() => {
+                            speakMessage(text);
+                        }, 500);
+                    }
+                }
+                
+                chatMessages.appendChild(messageElement);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            // Send message
+            function sendMessage() {
+                const message = chatInput.value.trim();
+                if (message) {
+                    // Add user message
+                    addMessage(message, true);
+                    
+                    // Clear input
+                    chatInput.value = '';
+                    
+                    // Get bot response
+                    getBotResponse(message);
+                }
+            }
+            
+            // Get bot response (simulated)
+            function getBotResponse(message) {
+                setTimeout(() => {
+                    let botResponse = getLocalizedResponse(message);
+                    addMessage(botResponse, false);
+                }, 1000);
+            }
+            
+            // Get a localized response based on the message and current language
+            function getLocalizedResponse(message) {
+                const lowerMessage = message.toLowerCase();
+                
+                // English responses
+                if (currentLanguage === 'en') {
+                    if (lowerMessage.includes('welcome')) {
+    return " Welcome to Farmer Assistant!\n" +
+           "I'm here to help with all your farming-related questions.\n" +
+           "You can ask me about crops, soil health, pest control, irrigation, and more.\n" +
+           "How can I assist you today?";
+} else if (lowerMessage.includes('crop rotation')) {
+    return "Crop rotation is a systematic approach to deciding which crop to plant where in your vegetable garden from one year to the next.\n" +
+           "The basic principles of crop rotation include:\n" +
+           "   1. Avoid planting the same crop family in the same location for consecutive seasons.\n" +
+           "   2. Group crops by family for rotation planning.\n" +
+           "   3. Consider nutrient needs when planning rotations.\n" +
+           "   4. Incorporate cover crops into your rotation.\n" +
+           "   5. Keep detailed records of what was planted where.\n" +
+           "Benefits include improved soil health, natural pest and disease management, balanced soil nutrients, and increased biodiversity.\n" +
+           "A simple 4-year rotation might include: Year 1 - Legumes, Year 2 - Brassicas, Year 3 - Alliums, Year 4 - Solanaceae.";
+} else if (lowerMessage.includes('organic farming')) {
+    return "• Organic farming relies on ecological processes, biodiversity, and cycles adapted to local conditions rather than using synthetic materials.\n" +
+           "• Key practices include:\n" +
+           "   1. Crop rotation and intercropping.\n" +
+           "   2. Cover crops and green manures.\n" +
+           "   3. Composting and organic waste recycling.\n" +
+           "   4. Natural pest management using beneficial insects.\n" +
+           "   5. Biological and mechanical weed control.\n" +
+           "   6. Soil conservation techniques.\n" +
+           "   7. Use of organic fertilizers and amendments.\n" +
+           "• Organic farming helps maintain soil health, reduces pollution, conserves water, reduces soil erosion, and promotes biodiversity.";
+} else if (lowerMessage.includes('soil fertility')) {
+    return "• Improving soil fertility naturally involves several sustainable practices:\n" +
+           "   1. Regular soil testing to understand current nutrient levels.\n" +
+           "   2. Adding organic matter through compost, manure, and crop residues.\n" +
+           "   3. Growing cover crops and green manures.\n" +
+           "   4. Practicing crop rotation to balance nutrient demands.\n" +
+           "   5. Applying natural amendments like rock phosphate, bone meal, or wood ash.\n" +
+           "   6. Using biofertilizers containing beneficial microorganisms.\n" +
+           "   7. Mulching to conserve moisture and add organic matter.\n" +
+           "   8. Minimizing tillage to protect soil structure.\n" +
+           "• Healthy soil should have good structure, appropriate pH (6.0-7.0 for most crops), and adequate organic matter (3-5%).";
+} else if (lowerMessage.includes('pest control')) {
+    return "• Integrated Pest Management (IPM) offers a sustainable approach to pest control with minimal environmental impact.\n" +
+           "• Key strategies include:\n" +
+           "   1. Prevention: Choose resistant varieties, practice crop rotation, and maintain proper spacing.\n" +
+           "   2. Monitoring: Regularly inspect plants for early signs of pests.\n" +
+           "   3. Cultural controls: Adjust planting times, use trap crops, and remove infected plants.\n" +
+           "   4. Physical controls: Use barriers, traps, and manual removal.\n" +
+           "   5. Biological controls: Introduce beneficial insects and microorganisms.\n" +
+           "   6. Chemical controls: As a last resort, use targeted organic pesticides.\n" +
+           "• Beneficial insects include ladybugs (for aphids), lacewings (for soft-bodied insects), praying mantises (general predators), and parasitic wasps (for caterpillars).";
+} else if (lowerMessage.includes('water management')) {
+    return "• Efficient water management is crucial for sustainable farming.\n" +
+           "• Key practices include:\n" +
+           "   1. Drip irrigation: Delivers water directly to plant roots with 90% efficiency.\n" +
+           "   2. Rainwater harvesting: Collecting and storing rainwater for later use.\n" +
+           "   3. Mulching: Reduces evaporation and conserves soil moisture.\n" +
+           "   4. Cover cropping: Improves soil structure and water retention.\n" +
+           "   5. Contour farming: Prevents runoff on sloped land.\n" +
+           "   6. Soil organic matter: Each 1% increase in organic matter helps soil hold 20,000 more gallons of water per acre.";
+} else if (lowerMessage.includes('rainy season crops')) {
+    return "• Crops suitable for rainy season (Kharif) cultivation include:\n" +
+           "   1. Rice: Requires standing water and high humidity.\n" +
+           "   2. Maize (Corn): Thrives in warm, moist conditions.\n" +
+           "   3. Millets: Drought-resistant options include bajra, jowar, and ragi.\n" +
+           "   4. Pulses: Moong dal, urad dal, and pigeon pea (tur/arhar).\n" +
+           "   5. Oilseeds: Groundnut, soybean, and sesame.\n" +
+           "   6. Cotton: Requires consistent moisture during flowering.\n" +
+           "   7. Vegetables: Okra, cucumber, ridge gourd, bitter gourd.";
+} else if (lowerMessage.includes('crop diseases')) {
+    return "• Managing crop diseases effectively requires an integrated approach:\n" +
+           "   1. Prevention:\n" +
+           "      - Use disease-resistant varieties.\n" +
+           "      - Practice crop rotation (3-4 year cycles).\n" +
+           "      - Maintain proper plant spacing for air circulation.\n" +
+           "      - Use pathogen-free seeds and planting materials.\n" +
+           "      - Sterilize tools between plants.\n" +
+           "   2. Monitoring:\n" +
+           "      - Inspect plants regularly for symptoms.\n" +
+           "      - Identify diseases early through observation or testing.\n" +
+           "   3. Treatment:\n" +
+           "      - Remove and destroy infected plant parts.\n" +
+           "      - Apply appropriate fungicides or bactericides.\n" +
+           "      - Consider biological controls like Trichoderma.";
+} else if (lowerMessage.includes('soil erosion')) {
+    return "• Natural methods to control soil erosion include:\n" +
+           "   1. Vegetative barriers: Planting grasses, shrubs, or trees along contours.\n" +
+           "   2. Cover cropping: Keeping soil covered during off-seasons.\n" +
+           "   3. Contour farming: Plowing and planting across slopes, not up/down.\n" +
+           "   4. Terracing: Creating step-like structures on steep slopes.\n" +
+           "   5. No-till or reduced tillage: Minimizing soil disturbance.\n" +
+           "   6. Mulching: Covering soil with organic materials.\n" +
+           "   7. Windbreaks: Planting trees to reduce wind erosion.\n" +
+           "   8. Buffer strips: Maintaining permanent vegetation near water bodies.";
+} else if (lowerMessage.includes('fertilizers')) {
+    return "• Selecting appropriate fertilizers depends on soil type, crop needs, and environmental factors:\n" +
+           "   1. For clay soils:\n" +
+           "      - Avoid heavy applications of nitrogen.\n" +
+           "      - Use slow-release organic fertilizers.\n" +
+           "      - Apply gypsum to improve structure.\n" +
+           "      - Consider compost to improve drainage and aeration.\n" +
+           "   2. For sandy soils:\n" +
+           "      - Use fertilizers with higher organic matter content.\n" +
+           "      - Apply smaller amounts more frequently.\n" +
+           "      - Include micronutrients which leach easily.\n" +
+           "      - Consider humic substances to improve retention.\n" +
+           "   3. For organic options:\n" +
+           "      - Compost (balanced nutrients and soil improvement).\n" +
+           "      - Animal manures (nitrogen-rich, best composted first).\n" +
+           "      - Bone meal (phosphorus).\n" +
+           "      - Blood meal (nitrogen).\n" +
+           "      - Rock phosphate (slow-release phosphorus).\n" +
+           "      - Kelp/seaweed (micronutrients and growth stimulants).";
+} else if (lowerMessage.includes('natural pesticides')) {
+    return "• Effective natural pesticides for vegetable gardens include:\n" +
+           "   1. Neem oil: Controls a wide range of insects by disrupting feeding and growth.\n" +
+           "   2. Garlic spray: Repels aphids, cabbage loppers, and beetles.\n" +
+           "   3. Diatomaceous earth: Kills insects by damaging their exoskeletons.\n" +
+           "   4. Soap spray: Works on soft-bodied insects like aphids and mites.\n" +
+           "   5. Bacillus thuringiensis (Bt): A bacterium that controls caterpillars.\n" +
+           "   6. Pyrethrin: Derived from chrysanthemum flowers, it affects the nervous systems of insects.\n" +
+           "   7. Beneficial nematodes: Parasitize soil-dwelling pests such as grubs and root maggots.";
+} else {
+    return "• I'm processing your request.\n" +
+           "• Please provide more details about your farming question so I can give you the most helpful information.";
+}
+
+                }
+                // Spanish responses
+                else if (currentLanguage === 'te') {
+                    if (lowerMessage.includes('welcome')) {
+    return "• ఫార్మర్ అసిస్టెంట్‌కు స్వాగతం!\n" +
+           "• మీ వ్యవసాయ సంబంధిత ప్రశ్నలకు సహాయం చేయడానికి నేను ఇక్కడ ఉన్నాను.\n" +
+           "• పంటలు, నేల ఆరోగ్యం, కీటక నియంత్రణ, నీటి పారుదల, ఇంకా అనేక విషయాలను అడగండి.\n" +
+           "• మీకు ఏదైనా సహాయం కావాలా?";
+} else if (lowerMessage.includes('crop rotation')) {
+    return "• పంటల మార్పిడి అనేది విత్తనాలను ఏటా ఏ ప్రాంతంలో వేయాలో నిర్ణయించే వ్యవస్థ.\n" +
+           "• పంటల మార్పిడి యొక్క ప్రధాన సిద్ధాంతాలు:\n" +
+           "   1. ఒకే పంటను ప్రతి సీజన్‌లో ఒకే స్థలంలో వేయకుండా నివారించాలి.\n" +
+           "   2. పంటలను కుటుంబం ప్రకారం గ్రూప్ చేయాలి.\n" +
+           "   3. రోటేషన్ ప్లానింగ్ కోసం పోషక అవసరాలను పరిగణనలోకి తీసుకోవాలి.\n" +
+           "   4. పచ్చి పంటలను (కవర్ క్రాప్స్) ఉపయోగించాలి.\n" +
+           "   5. ఏ పంట ఎక్కడ వేసారో రికార్డులను సరిగ్గా ఉంచాలి.\n" +
+           "• పంటల మార్పిడి వల్ల నేల ఆరోగ్యం మెరుగవుతుంది, ప్రకృతితో సహకరించే కీటకాలు మరియు వ్యాధి నియంత్రణ కలిగిస్తుంది.\n" +
+           "• సరళమైన 4 సంవత్సరాల రోటేషన్ ఉండవచ్చు: సంవత్సరం 1 - పప్పు వర్గం, సంవత్సరం 2 - బ్రాసికా వర్గం, సంవత్సరం 3 - అలియుమ్స్, సంవత్సరం 4 - సోలనేసీ వర్గం.";
+} else if (lowerMessage.includes('organic farming')) {
+    return "• సేంద్రీయ వ్యవసాయం స్థానిక పరిస్థితులకు అనుగుణంగా పారిసర సమతులు మరియు జీవ వైవిధ్యం ఆధారంగా ఉంటుంది.\n" +
+           "• ముఖ్యమైన పద్ధతులు:\n" +
+           "   1. పంటల మార్పిడి మరియు ఇంటర్‌క్రాపింగ్.\n" +
+           "   2. కవర్ క్రాప్స్ మరియు గ్రీన్ మాన్యూర్లు.\n" +
+           "   3. కంపోస్టింగ్ మరియు సేంద్రియ వ్యర్థాల రీసైక్లింగ్.\n" +
+           "   4. సహజ కీటక నియంత్రణ.\n" +
+           "   5. మట్టి సంరక్షణ పద్ధతులు.\n" +
+           "   6. సేంద్రియ ఎరువులు మరియు సవరణలను ఉపయోగించడం.\n" +
+           "• సేంద్రియ వ్యవసాయం ద్వారా మట్టిలో జీవ చైతన్యం మెరుగుపడుతుంది, నీటి కాలుష్యం తగ్గుతుంది, మరియు జీవ వైవిధ్యం పెరుగుతుంది.";
+} else if (lowerMessage.includes('soil fertility')) {
+    return "• మట్టిలో జీవ చైతన్యం పెంపొందించడానికి అనేక విధానాలు ఉన్నాయి:\n" +
+           "   1. మట్టిని సతతంగా పరీక్షించడం.\n" +
+           "   2. సేంద్రియ పదార్థాలు, కంపోస్టు, పశువుల ఎరువులు ఉపయోగించడం.\n" +
+           "   3. కవర్ క్రాప్స్ వేసి నేల స్థితిని మెరుగుపరచడం.\n" +
+           "   4. పంటల మార్పిడి చేయడం.\n" +
+           "   5. సహజ ఎరువులు మరియు సవరణలను ఉపయోగించడం.\n" +
+           "   6. మట్టిని పూడ్చడానికి గడ్డి, ఆకుపచ్చ పదార్థాలు.\n" +
+           "• ఆరోగ్యకరమైన మట్టికి సరైన పీహెచ్ (6.0-7.0) మరియు సరైన జీవ పదార్థం (3-5%) అవసరం.";
+} else if (lowerMessage.includes('pest control')) {
+    return "• సమగ్ర కీటక నిర్వహణ (IPM) అనేది స్థిరమైన పద్ధతిలో కీటకాలను నియంత్రించే విధానం.\n" +
+           "• ముఖ్యమైన విధానాలు:\n" +
+           "   1. నివారణ: నిరోధక విత్తనాలను ఎంచుకోవడం మరియు పంటల మార్పిడి చేయడం.\n" +
+           "   2. పర్యవేక్షణ: కీటకాలను త్వరగా గుర్తించడం.\n" +
+           "   3. సాంస్కృతిక నియంత్రణ: పంట వేయడం మరియు కీటకాల సమయం మార్చడం.\n" +
+           "   4. శారీరక నియంత్రణ: బారియర్లు, ఉచ్చు లేదా చేతులతో తొలగించడం.\n" +
+           "   5. జీవ నియంత్రణ: సహజ శత్రువులను ప్రవేశపెట్టడం.\n" +
+           "   6. రసాయన నియంత్రణ: చివరిగా సేంద్రీయ రసాయనాలను ఉపయోగించడం.\n" +
+           "• లేడీబగ్స్ (ఆఫిడ్స్ కోసం), లేస్‌వింగ్స్ (సాఫ్ట్-బాడీడ్ కీటకాలు) మరియు పరాన్నీహి గుడ్లని ఉపయోగించవచ్చు.";
+} else if (lowerMessage.includes('water management')) {
+    return "• నీటి నిర్వహణ వ్యవసాయంలో ముఖ్యమైనది.\n" +
+           "• ముఖ్యమైన విధానాలు:\n" +
+           "   1. డ్రిప్ సించనం: ఇది 90% నీటి వినియోగ సామర్థ్యాన్ని కలిగి ఉంటుంది.\n" +
+           "   2. వర్షం నీటిని సేకరించడం: వర్షం నీటిని సేకరించి భవిష్యత్‌లో ఉపయోగించడం.\n" +
+           "   3. మల్చింగ్: నేలలో తేమ నిల్వ ఉంచడం.\n" +
+           "   4. కవర్ క్రాప్స్: నేల యొక్క నీటి నిల్వ సామర్థ్యాన్ని మెరుగుపరచడం.\n" +
+           "   5. పర్వత ప్రాంతాల్లో కాంటూర్ సాగు: నేల తొలగింపును నివారించడం.\n" +
+           "• సేంద్రియ పదార్థం నీటి నిల్వ సామర్థ్యాన్ని పెంచుతుంది.";
+} else if (lowerMessage.includes('rainy season crops')) {
+    return "• వర్షాకాలం (ఖరీఫ్) కోసం తగిన పంటలు:\n" +
+           "   1. బియ్యం: నీటిలో ఉండి పండుతుంది.\n" +
+           "   2. మక్కజొన్న: తేమతో పండుతుంది.\n" +
+           "   3. మిల్లెట్స్: బజ్రా, జొన్నలు మరియు రాగి వంటి పంటలు.\n" +
+           "   4. పప్పులు: మునగ, ఉరద్ మరియు అరహర్ పప్పు.\n" +
+           "   5. నూనె గింజలు: వేరుశెనగ, సోయాబీన్ మరియు నువ్వు.\n" +
+           "   6. పత్తి: తేమలో పండుతుంది.\n" +
+           "   7. కూరగాయలు: బెండకాయ, దోసకాయ, బీరకాయ, కాకరకాయ.";
+} else if (lowerMessage.includes('crop diseases')) {
+    return "• పంట వ్యాధులను సమర్థవంతంగా నిర్వహించడానికి:\n" +
+           "   1. నివారణ:\n" +
+           "      - వ్యాధి నిరోధక విత్తనాలను ఉపయోగించండి.\n" +
+           "      - 3-4 సంవత్సరాల చక్రంలో పంటల మార్పిడి చేయండి.\n" +
+           "      - సరైన శ్వాసన కోసం మొక్కల మధ్య స్థలం.\n" +
+           "   2. పర్యవేక్షణ:\n" +
+           "      - వ్యాధులను కనుగొనండి.\n" +
+           "   3. చికిత్స:\n" +
+           "      - తగిన ఫంగిసైడ్లు లేదా బ్యాక్టీరియాసైడ్లను ఉపయోగించండి.";
+} else if (lowerMessage.includes('soil erosion')) {
+    return "• సహజ పద్ధతులు మట్టి క్షీణతను నివారించడానికి:\n" +
+           "   1. మొక్కలు లేదా చెట్లు నాటడం.\n" +
+           "   2. కవర్ క్రాప్స్ ఉపయోగించడం.\n" +
+           "   3. కాంటూర్ సాగు మరియు మల్చింగ్ చేయడం.\n" +
+           "   4. వాతావరణ ప్రభావాలను తగ్గించడం.";
+} else if (lowerMessage.includes('fertilizers')) {
+    return "• సరైన ఎరువులు పంట మరియు నేల అవసరాలకు అనుగుణంగా ఉండాలి:\n" +
+           "   1. మట్టి రకాన్ని బట్టి ఎరువులు ఎంచుకోండి.\n" +
+           "   2. ప్రకృతితో అనుగుణంగా ఉన్న సేంద్రీయ ఎరువులు ఉపయోగించండి.\n" +
+           "   3. భూసారాన్ని కాపాడడానికి తక్కువ నిల్వ చేసిన ఉత్పత్తులు.\n" +
+           "   4. మట్టిలో భద్రత మరియు పోషకాలను మెరుగుపరచడానికి కంపోస్ట్ ఉపయోగించండి.";
+} else if (lowerMessage.includes('organic pesticides')) {
+    return "• సహజ కీటకనాశకాలు:\n" +
+           "   1. నిమ్ ఆయిల్: పుష్పాలు మరియు కీటకాల ఉత్పత్తిపై పని చేస్తుంది.\n" +
+           "   2. గార్లిక్ స్ప్రే: అనేక రకాల కీటకాలతో పనిచేస్తుంది.\n" +
+           "   3. డయటోమేసియస్ ఎర్త్: కీటకాల ఎగ్జోస్కెలిటన్‌ను దెబ్బతీయడం ద్వారా చంపుతుంది.\n" +
+           "   4. సాప్ స్ప్రే: ఆఫిడ్స్ మరియు మిట్స్ వంటి మృదువైన కీటకాలపై పనిచేస్తుంది.\n" +
+           "   5. బసిలస్ తురింజియెన్సిస్ (Bt): క్యాటర్‌పిల్లర్లను నియంత్రించే బ్యాక్టీరియా.\n" +
+           "   6. పైరిథ్రిన్: క్రిసంతేమం పువ్వుల నుంచి తీసుకుంటారు, ఇది కీటకాల నరాల వ్యవస్థపై ప్రభావం చూపుతుంది.\n" +
+           "   7. లాభదాయకమైన నేమటోడ్స్: గ్రబ్స్ మరియు రూట్ మాగోట్స్ వంటి నేల-నివాసి కీటకాలను పరాన్నీవృత్తం చేస్తాయి.";
+} else {
+    return "• నేను మీ అభ్యర్థనను ప్రాసెస్ చేస్తున్నాను.\n" +
+           "• మీ వ్యవసాయ ప్రశ్న గురించి మరిన్ని వివరాలను అందించండి, తద్వారా నేను మీకు సహాయకమైన సమాచారం ఇవ్వగలను.";
+}
+
+                }
+                // French responses
+                if (currentLanguage === 'hi') {
+                    if (lowerMessage.includes('welcome')) {
+    return "किसान सहायक में आपका स्वागत है! मैं आपकी कृषि से संबंधित सभी प्रश्नों में मदद करने के लिए यहां हूं। आप मुझसे फसलों, मिट्टी की सेहत, कीट नियंत्रण, सिंचाई और अन्य विषयों के बारे में पूछ सकते हैं। आज मैं आपकी कैसे सहायता कर सकता हूं?";
+} else if (lowerMessage.includes('crop rotation')) {
+    return "फसल चक्रण एक प्रणालीगत दृष्टिकोण है जिसमें यह तय किया जाता है कि आपके सब्जी के बगीचे में एक साल से अगले साल किस स्थान पर कौन सी फसल लगानी है। फसल चक्रण के मुख्य सिद्धांतों में शामिल हैं:\n\n1. लगातार मौसमों के लिए एक ही स्थान पर एक ही फसल परिवार न लगाएं\n2. फसल चक्रण की योजना बनाने के लिए फसलों को परिवार के अनुसार समूहित करें\n3. फसल चक्रण की योजना बनाते समय पोषक तत्वों की जरूरतों का विचार करें\n4. अपने चक्रण में ढाँचा फसलें शामिल करें\n5. किस स्थान पर क्या लगाया गया है, इसका विवरण रखें\n\nफायदे: बेहतर मिट्टी की सेहत, प्राकृतिक कीट और रोग प्रबंधन, संतुलित मिट्टी के पोषक तत्व और जैव विविधता में वृद्धि। एक सरल 4-वर्षीय चक्रण में शामिल हो सकता है: वर्ष 1 - दलहन, वर्ष 2 - ब्रैसिका, वर्ष 3 - एलियम, वर्ष 4 - सोलनसी।";
+} else if (lowerMessage.includes('organic farming')) {
+    return "जैविक खेती प्राकृतिक प्रक्रियाओं, जैव विविधता और स्थानीय स्थितियों के अनुकूल चक्रों पर निर्भर करती है, न कि सिंथेटिक पदार्थों का उपयोग करने पर। मुख्य प्रथाओं में शामिल हैं:\n\n1. फसल चक्रण और अंतरवर्ती खेती\n2. ढाँचा फसलों और हरी खाद का उपयोग\n3. कंपोस्टिंग और जैविक कचरे की पुनः चक्रण\n4. लाभकारी कीड़ों का उपयोग करके प्राकृतिक कीट प्रबंधन\n5. जैविक और यांत्रिक खरपतवार नियंत्रण\n6. मिट्टी संरक्षण तकनीकें\n7. जैविक खादों और संशोधनों का उपयोग\n\nजैविक खेती मिट्टी की सेहत को बनाए रखने, प्रदूषण को कम करने, पानी की बचत करने, मिट्टी के कटाव को कम करने और जैव विविधता को बढ़ावा देने में मदद करती है।";
+} else if (lowerMessage.includes('soil fertility')) {
+    return "मिट्टी की उपजाऊता को प्राकृतिक रूप से सुधारने के लिए कई स्थायी प्रक्रियाएँ शामिल हैं:\n\n1. मिट्टी की नियमित जांच करके वर्तमान पोषक तत्व स्तरों को समझें\n2. जैविक पदार्थ, जैसे कंपोस्ट, गोबर और फसल अवशेष, मिलाएँ\n3. ढाँचा फसलें और हरी खाद उगाएं\n4. फसल चक्रण का पालन करें ताकि पोषक तत्वों की माँग संतुलित रहे\n5. प्राकृतिक संशोधन जैसे चट्टान फॉस्फेट, हड्डी का चूर्ण या लकड़ी की राख का उपयोग करें\n6. लाभकारी सूक्ष्मजीवों वाले जैविक खाद का उपयोग करें\n7. नमी बनाए रखने और जैविक पदार्थ मिलाने के लिए मल्चिंग करें\n8. मिट्टी की संरचना की रक्षा करने के लिए कम जुताई करें।";
+} else if (lowerMessage.includes('pest control')) {
+    return "समेकित कीट प्रबंधन (IPM) न्यूनतम पर्यावरणीय प्रभाव के साथ कीट नियंत्रण के लिए एक स्थायी दृष्टिकोण प्रदान करता है। मुख्य रणनीतियाँ शामिल हैं:\n\n1. रोकथाम: प्रतिरोधी किस्मों का चयन करें, फसल चक्रण का अभ्यास करें और उचित अंतराल बनाए रखें\n2. निगरानी: कीटों के शुरुआती संकेतों के लिए पौधों की नियमित रूप से जांच करें\n3. सांस्कृतिक नियंत्रण: रोपण समय को समायोजित करें, जाल फसलें उगाएं और संक्रमित पौधों को हटा दें\n4. भौतिक नियंत्रण: बाधाओं, जालों और हाथ से हटाने का उपयोग करें\n5. जैविक नियंत्रण: लाभकारी कीड़े और सूक्ष्मजीवों का परिचय दें\n6. रासायनिक नियंत्रण: अंतिम उपाय के रूप में, लक्षित जैविक कीटनाशकों का उपयोग करें।";
+} else {
+    return "मैं आपकी रिक्वेस्ट प्रोसेस कर रहा हूं। कृपया अपनी कृषि संबंधित सवाल का और विवरण दें ताकि मैं आपकी अधिकतम मदद कर सकूं।";
+}
+
+
+                }
+                // Default to English for other languages
+                else {
+                    return "I'm processing your request. Please provide more details about your farming question so I can give you the most helpful information.";
+                }
+            }
+            
+            // Initialize
+            function initialize() {
+                initializeSpeechRecognition();
+                
+                // Wait for voices to be loaded (needed for some browsers)
+                if (speechSynthesis.onvoiceschanged !== undefined) {
+                    speechSynthesis.onvoiceschanged = function() {
+                        // Voices are loaded
+                    };
+                }
+                
+                // Event listeners
+                sendButton.addEventListener('click', sendMessage);
+                
+                chatInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        sendMessage();
+                    }
+                });
+                
+                micButton.addEventListener('click', toggleSpeechRecognition);
+                
+                ttsToggle.addEventListener('click', toggleAutoTTS);
+                
+                languageSelector.addEventListener('change', updateLanguage);
+                
+                // Add speak button listeners to existing messages
+                document.querySelectorAll('.speak-button').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const message = this.parentElement.parentElement.textContent.trim();
+                        speakMessage(message.replace('🔊', '').trim());
+                    });
+                });
+            }
+            
+            // Start the app
+            initialize();
+        });
+        // Rest of your existing JavaScript code...
+    </script>
+</body>
+</html>
