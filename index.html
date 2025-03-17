@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <title>Farmer Assistance Chatbot</title>
     <style>
         :root {
@@ -39,7 +40,7 @@
         }
 
         header {
-            padding: 1rem;
+            padding: 0.1rem;
             text-align: center;
             color: rgb(253, 248, 248);
         }
@@ -48,15 +49,15 @@
             display: flex;
             justify-content: center;
             background-color: var(--secondary);
-            padding: 0.5rem;
+            padding: 0 rem;
         }
 
         nav a {
             color: white;
             text-decoration: none;
-            padding: 0.5rem 1rem;
+            padding: 0.5rem 0.5rem;
             margin: 0 0.5rem;
-            border-radius: 4px;
+            border-radius: 2px;
             transition: background-color 0.3s;
         }
 
@@ -67,7 +68,7 @@
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 2rem;
+            padding: 0 rem;
         }
 
         .hero {
@@ -79,11 +80,11 @@
         }
 
         .hero-content {
-            flex: 1;
+            flex: 0.5;
         }
 
         .hero-image {
-            flex: 1;
+            flex: 0.5;
             text-align: center;
         }
 
@@ -112,7 +113,7 @@
         .btn {
             display: inline-block;
             background-color: var(--primary);
-            color: white;
+            color: rgb(255, 255, 255);
             padding: 0.8rem 1.5rem;
             border-radius: 4px;
             text-decoration: none;
@@ -134,7 +135,7 @@
         }
 
         .feature-card {
-            background-color: white;
+            background-color: 4rgb(234, 247, 235);
             border-radius: 8px;
             padding: 1.5rem;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
@@ -491,7 +492,7 @@
             <div class="hero-content">
                 <h2>Empowering Farmers with Technology</h2>
                 <p>Get expert advice, crop management tips, disease identification, water optimization strategies, and market insights - all in one place.</p>
-                <a href="#chatbot" class="btn">Start Chatting</a>
+                <a href="#chatbot" class="btn">Seek Assistance From Expert</a>
             </div>
             <div class="hero-image">
                 <img src="https://tse2.mm.bing.net/th?id=OIP.muaR9jzon2_EmC0WxyKcKQHaEt&pid=Api&P=0&h=220" alt="Farming with technology">
@@ -796,17 +797,13 @@
                 const placeholders = {
                     'en': "Type your farming question here...",
                     'te': "మీ వ్యవసాయ ప్రశ్నను ఇక్కడ టైప్ చేయండి...",
-                    'hi': "अपना कृषि प्रश्न यहाँ टाइप करें...",
-                    'ta': "உங்கள் விவசாய கேள்வியை இங்கே தட்டச்சு செய்க...",
-                    'ka': "ನಿಮ್ಮ ಕೃಷಿ ಪ್ರಶ್ನೆಯನ್ನು ಇಲ್ಲಿ ಟೈಪ್ ಮಾಡಿ..."
+                    'hi': "अपना कृषि प्रश्न यहाँ टाइप करें..."
                 };
                 
                 const sendTexts = {
                     'en': "Send",
                     'te': "పంపించు",
-                    'hi': "भजें",
-                    'ta': "அனுப்பு",
-                    'ka': "ಕಳುಹಿಸಿ"
+                    'hi': "भजें"
                 };
                 
                 chatInput.placeholder = placeholders[currentLanguage] || placeholders['en'];
@@ -818,9 +815,7 @@
                     const welcomeTexts = {
                         'en': "Hello! I'm your Farming Assistant. How can I help you today? Ask me about crop management, pest identification, water optimization, or market insights.",
                         'te': "హలో! నేను మీ వ్యవసాయ సహాయకుడిని. ఈరోజు మీకు ఎలా సహాయం చేయగలను? పంటల నిర్వహణ, కీటకాల గుర్తింపు, నీటి అనుకూలీకరణ, లేదా మార్కెట్ అంతర్దృష్టుల గురించి నన్ను అడగండి.",
-                        'hi': "नमस्ते! मैं आपका कृषि सहायक हूं। आज मैं आपकी कैसे मदद कर सकता हूं? मुझसे फसल प्रबंधन, कीट पहचान, पानी अनुकूलन, या बाजार अंतर्दृष्टि के बारे में पूछें।",
-                        'ta': "வணக்கம்! நான் உங்கள் விவசாய உதவியாளன். இன்று உங்களுக்கு எப்படி உதவலாம்? பயிர் மேலாண்மை, பூச்சி அடையாளம், நீர் மேம்பாடு, அல்லது சந்தை பற்றிய பார்வைகள் குறித்து என்னிடம் கேளுங்கள்.",
-                        'ka': "你好ನಮಸ್ಕಾರ! ನಾನು ನಿಮ್ಮ ಕೃಷಿ ಸಹಾಯಕ. ಇಂದು ನಿಮಗೆ ಹೇಗೆ ಸಹಾಯ ಮಾಡಲಿ? ಬೆಳೆ ನಿರ್ವಹಣೆ, ಕೀಟ ಗುರುತಿಸುವಿಕೆ, ನೀರಿನ ಅನುಕೂಲತೆ, ಅಥವಾ ಮಾರುಕಟ್ಟೆ ಒಳನೋಟಗಳ ಬಗ್ಗೆ ನನ್ನನ್ನು ಕೇಳಿ.。"
+                        'hi': "नमस्ते! मैं आपका कृषि सहायक हूं। आज मैं आपकी कैसे मदद कर सकता हूं? मुझसे फसल प्रबंधन, कीट पहचान, पानी अनुकूलन, या बाजार अंतर्दृष्टि के बारे में पूछें।"
                     };
                     
                     welcomeMessage.textContent = welcomeTexts[currentLanguage] || welcomeTexts['en'];
@@ -1137,7 +1132,7 @@
                 }
                 // Default to English for other languages
                 else {
-                    return "I'm processing your request. Please provide more details about your farming question so I can give you the most helpful information.";
+                    return "I don't have specific information on that topic yet. Could you try asking about crop rotation, soil fertility, pest control, or water management?";
                 }
             }
             
@@ -1179,7 +1174,6 @@
             // Start the app
             initialize();
         });
-        // Rest of your existing JavaScript code...
     </script>
 </body>
 </html>
